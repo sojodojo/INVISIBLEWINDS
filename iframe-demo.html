@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Iframe embed simulation — Arts on the Move</title>
+<style>
+  /* Rough stand-in for a Squarespace page so the embed can be judged in context */
+  body { margin: 0; background: #fff; color: #222;
+    font-family: Georgia, "Times New Roman", serif; }
+  .sq-nav { display: flex; gap: 28px; justify-content: center; padding: 26px 0 22px;
+    font-family: system-ui, sans-serif; font-size: 13px; letter-spacing: .12em;
+    text-transform: uppercase; color: #555; border-bottom: 1px solid #eee; }
+  .sq-hero { text-align: center; padding: 48px 20px 8px; }
+  .sq-hero h1 { font-weight: 400; font-size: 34px; margin: 0 0 10px; }
+  .sq-hero p { color: #666; font-size: 16px; max-width: 620px; margin: 0 auto 34px; }
+  .sq-section { max-width: 1100px; margin: 0 auto; padding: 0 20px 70px; }
+  .sq-footer { border-top: 1px solid #eee; padding: 30px; text-align: center;
+    color: #999; font-size: 13px; font-family: system-ui, sans-serif; }
+
+  /* ↓↓↓ This block is the actual embed snippet that goes in the Squarespace Code Block ↓↓↓ */
+  .book-embed { position: relative; width: 100%; padding-bottom: 58%; height: 0; overflow: hidden; }
+  .book-embed iframe { position: absolute; top: 0; left: 0; width: 100%; height: 100%; border: 0; }
+</style>
+</head>
+<body>
+  <div class="sq-nav"><span>Home</span><span>About</span><span>Programs</span><span>The Book</span><span>Contact</span></div>
+  <div class="sq-hero">
+    <h1>My Life Stories</h1>
+    <p>Flip through the book below — drag a page corner, use the arrows, or your keyboard.</p>
+  </div>
+  <div class="sq-section">
+    <!-- ═══ Squarespace Code Block content starts here ═══ -->
+    <div class="book-embed">
+      <iframe src="embed.html?bg=%23ffffff" loading="lazy" allowfullscreen
+              title="My Life Stories — flip through the book"></iframe>
+    </div>
+    <!-- ═══ Squarespace Code Block content ends here ═══ -->
+  </div>
+  <div class="sq-footer">Arts on the Move — page mock-up for embed evaluation only</div>
+</body>
+</html>

@@ -1,0 +1,373 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>My Life Stories — Book Portal</title>
+<script src="vendor/page-flip.browser.js"></script>
+<script src="pages.js"></script>
+<style>
+  :root {
+    --bg: #26262a;
+    --panel: #323238;
+    --text: #e8e8ea;
+    --muted: #9a9aa2;
+    --accent: #e0b45c;
+  }
+  * { box-sizing: border-box; }
+  html, body {
+    margin: 0;
+    height: 100%;
+    background: var(--bg);
+    color: var(--text);
+    font-family: system-ui, "Segoe UI", sans-serif;
+  }
+  body { display: flex; flex-direction: column; overflow: hidden; }
+
+  header {
+    flex: 0 0 auto;
+    display: flex;
+    align-items: center;
+    gap: 18px;
+    padding: 10px 18px;
+    background: var(--panel);
+    box-shadow: 0 1px 6px rgba(0,0,0,.4);
+    z-index: 30;
+  }
+  header h1 {
+    font-size: 16px;
+    font-weight: 600;
+    margin: 0;
+    letter-spacing: .02em;
+  }
+  header .sub { color: var(--muted); font-size: 12.5px; }
+  .tabs { display: flex; gap: 6px; margin-left: auto; }
+  .tabs button {
+    background: transparent;
+    color: var(--muted);
+    border: 1px solid #4a4a52;
+    border-radius: 7px;
+    padding: 7px 16px;
+    font-size: 13.5px;
+    cursor: pointer;
+  }
+  .tabs button.active {
+    background: var(--accent);
+    border-color: var(--accent);
+    color: #211a08;
+    font-weight: 600;
+  }
+  .tabs button:not(.active):hover { color: var(--text); }
+
+  main { flex: 1 1 auto; position: relative; overflow: hidden; }
+
+  /* ---------- READ MODE ---------- */
+  #readView {
+    position: absolute; inset: 0;
+    display: flex; flex-direction: column;
+    align-items: center; justify-content: center;
+  }
+  #bookWrap { position: relative; }
+  .sheet {
+    background: #fff;
+    overflow: hidden;
+  }
+  .sheet svg { width: 100%; height: 100%; display: block; }
+  .sheet.--cover { background: #f4f0e8; }
+
+  #readBar {
+    flex: 0 0 auto;
+    display: flex;
+    gap: 12px;
+    align-items: center;
+    padding: 12px 0 16px;
+    user-select: none;
+  }
+  #readBar button {
+    background: #45454d;
+    color: var(--text);
+    border: 0;
+    border-radius: 7px;
+    padding: 8px 18px;
+    font-size: 14px;
+    cursor: pointer;
+  }
+  #readBar button:hover { background: #55555e; }
+  #pageNum { color: var(--muted); font-size: 13.5px; min-width: 110px; text-align: center; }
+  #hint { color: #77777e; font-size: 12px; }
+
+  /* ---------- INSPECT MODE ---------- */
+  #inspectView {
+    position: absolute; inset: 0;
+    overflow-y: auto;
+    padding: 22px;
+    display: none;
+  }
+  #grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+    gap: 18px;
+    max-width: 1500px;
+    margin: 0 auto;
+  }
+  .card {
+    background: var(--panel);
+    border-radius: 10px;
+    overflow: hidden;
+    cursor: zoom-in;
+    transition: transform .12s;
+  }
+  .card:hover { transform: translateY(-3px); }
+  .card .thumb {
+    aspect-ratio: 0.98439;
+    background: #fff;
+    display: flex;
+  }
+  .card .thumb svg { width: 100%; height: 100%; }
+  .card .label {
+    padding: 8px 12px;
+    font-size: 12.5px;
+    color: var(--muted);
+    display: flex;
+    justify-content: space-between;
+  }
+  .card .label b { color: var(--text); font-weight: 600; }
+
+  /* lightbox */
+  #lightbox {
+    position: fixed; inset: 0;
+    background: rgba(15,15,18,.93);
+    display: none;
+    z-index: 100;
+    overflow: auto;
+    cursor: zoom-out;
+  }
+  #lightbox .inner {
+    min-height: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 30px;
+    gap: 12px;
+  }
+  #lightbox .sheet {
+    background: #fff;
+    box-shadow: 0 8px 40px rgba(0,0,0,.6);
+    width: min(88vmin, 1000px);
+  }
+  #lightbox .sheet svg { width: 100%; height: auto; display: block; }
+  #lightbox .cap { color: var(--muted); font-size: 13px; }
+  #lightbox nav { display: flex; gap: 10px; }
+  #lightbox nav button {
+    background: #45454d; color: var(--text); border: 0;
+    border-radius: 7px; padding: 7px 16px; font-size: 13.5px; cursor: pointer;
+  }
+
+  #loading {
+    position: absolute; inset: 0;
+    display: flex; flex-direction: column; gap: 10px;
+    align-items: center; justify-content: center;
+    background: var(--bg);
+    color: var(--muted);
+    font-size: 15px;
+    z-index: 50;
+    transition: opacity .4s;
+  }
+  .spin {
+    width: 26px; height: 26px;
+    border: 3px solid #4a4a52;
+    border-top-color: var(--accent);
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+  }
+  @keyframes spin { to { transform: rotate(360deg); } }
+</style>
+</head>
+<body>
+
+<header>
+  <h1>My Life Stories</h1>
+  <span class="sub">local replica &middot; 36 pages &middot; all assets self-hosted</span>
+  <div class="tabs">
+    <button id="tabRead" class="active">Read</button>
+    <button id="tabInspect">Inspect pages</button>
+  </div>
+</header>
+
+<main>
+  <div id="readView">
+    <div id="bookWrap"><div id="book"></div></div>
+    <div id="readBar">
+      <button id="first">⏮</button>
+      <button id="prev">‹ Prev</button>
+      <span id="pageNum"></span>
+      <button id="next">Next ›</button>
+      <button id="last">⏭</button>
+      <span id="hint">tip: drag a page corner, or use ← → keys</span>
+    </div>
+  </div>
+
+  <div id="inspectView"><div id="grid"></div></div>
+
+  <div id="lightbox">
+    <div class="inner">
+      <div class="sheet" id="lbSheet"></div>
+      <div class="cap" id="lbCap"></div>
+      <nav>
+        <button id="lbPrev">‹ Prev</button>
+        <button id="lbClose">Close</button>
+        <button id="lbNext">Next ›</button>
+      </nav>
+    </div>
+  </div>
+
+  <div id="loading"><div class="spin"></div><div>Loading book…</div></div>
+</main>
+
+<script>
+const PAGE_FILES = window.PAGE_FILES; // bundled in pages.js (works from file:// too)
+const ASPECT = 0.98439; // 8.5x8.5 hardcover, effective page w/h from Mixbook project data
+const N = PAGE_FILES.length;
+
+let svgSources = [];
+let pageFlip = null;
+let lbIndex = 0;
+
+function pageLabel(i) {
+  if (i === 0) return "Front cover";
+  if (i === N - 1) return "Back cover";
+  return "Page " + i;
+}
+
+function makeSvgNode(raw) {
+  const div = document.createElement("div");
+  div.innerHTML = raw;
+  const svg = div.querySelector("svg");
+  svg.removeAttribute("width");
+  svg.removeAttribute("height");
+  svg.setAttribute("preserveAspectRatio", "xMidYMid slice");
+  return svg;
+}
+
+async function boot() {
+  svgSources = window.PAGE_SVGS; // bundled in pages.js — no fetch, so file:// works
+
+  // ---- book ----
+  const book = document.getElementById("book");
+  svgSources.forEach((raw, i) => {
+    const holder = document.createElement("div");
+    const isCover = i === 0 || i === N - 1;
+    holder.className = "sheet" + (isCover ? " --cover" : "");
+    holder.setAttribute("data-density", isCover ? "hard" : "soft");
+    holder.appendChild(makeSvgNode(raw));
+    book.appendChild(holder);
+  });
+
+  const maxH = Math.min(window.innerHeight - 160, 860);
+  const pageH = Math.max(420, maxH);
+  const pageW = Math.round(pageH * ASPECT);
+
+  pageFlip = new St.PageFlip(book, {
+    width: pageW,
+    height: pageH,
+    size: "fixed",
+    showCover: true,
+    maxShadowOpacity: 0.5,
+    flippingTime: 700,
+    usePortrait: false,
+    mobileScrollSupport: false,
+    drawShadow: true
+  });
+  pageFlip.loadFromHTML(book.querySelectorAll(":scope > .sheet"));
+
+  const pageNum = document.getElementById("pageNum");
+  const update = () => {
+    pageNum.textContent = pageLabel(pageFlip.getCurrentPageIndex()) + "  ·  " +
+      (pageFlip.getCurrentPageIndex() + 1) + " / " + N;
+  };
+  pageFlip.on("flip", update);
+  update();
+
+  document.getElementById("prev").onclick = () => pageFlip.flipPrev("top");
+  document.getElementById("next").onclick = () => pageFlip.flipNext("top");
+  document.getElementById("first").onclick = () => pageFlip.flip(0);
+  document.getElementById("last").onclick = () => pageFlip.flip(N - 1);
+  document.addEventListener("keydown", e => {
+    if (document.getElementById("lightbox").style.display === "block") {
+      if (e.key === "ArrowLeft") showLightbox(lbIndex - 1);
+      if (e.key === "ArrowRight") showLightbox(lbIndex + 1);
+      if (e.key === "Escape") closeLightbox();
+      return;
+    }
+    if (readVisible()) {
+      if (e.key === "ArrowLeft") pageFlip.flipPrev("top");
+      if (e.key === "ArrowRight") pageFlip.flipNext("top");
+    }
+  });
+
+  // ---- inspector grid ----
+  const grid = document.getElementById("grid");
+  svgSources.forEach((raw, i) => {
+    const card = document.createElement("div");
+    card.className = "card";
+    const thumb = document.createElement("div");
+    thumb.className = "thumb";
+    thumb.appendChild(makeSvgNode(raw));
+    const label = document.createElement("div");
+    label.className = "label";
+    label.innerHTML = "<b>" + pageLabel(i) + "</b><span>" +
+      PAGE_FILES[i].match(/_(\d+)\.svg$/)[1] + "</span>";
+    card.appendChild(thumb);
+    card.appendChild(label);
+    card.onclick = () => showLightbox(i);
+    grid.appendChild(card);
+  });
+
+  const loading = document.getElementById("loading");
+  loading.style.opacity = "0";
+  setTimeout(() => loading.remove(), 400);
+}
+
+// ---- tabs ----
+const readView = document.getElementById("readView");
+const inspectView = document.getElementById("inspectView");
+const tabRead = document.getElementById("tabRead");
+const tabInspect = document.getElementById("tabInspect");
+function readVisible() { return readView.style.display !== "none"; }
+tabRead.onclick = () => {
+  readView.style.display = "flex";
+  inspectView.style.display = "none";
+  tabRead.classList.add("active");
+  tabInspect.classList.remove("active");
+};
+tabInspect.onclick = () => {
+  readView.style.display = "none";
+  inspectView.style.display = "block";
+  tabInspect.classList.add("active");
+  tabRead.classList.remove("active");
+};
+
+// ---- lightbox ----
+const lightbox = document.getElementById("lightbox");
+function showLightbox(i) {
+  lbIndex = (i + N) % N;
+  const sheet = document.getElementById("lbSheet");
+  sheet.innerHTML = "";
+  const svg = makeSvgNode(svgSources[lbIndex]);
+  svg.setAttribute("preserveAspectRatio", "xMidYMid meet");
+  sheet.appendChild(svg);
+  document.getElementById("lbCap").textContent =
+    pageLabel(lbIndex) + " — " + PAGE_FILES[lbIndex];
+  lightbox.style.display = "block";
+}
+function closeLightbox() { lightbox.style.display = "none"; }
+lightbox.onclick = e => { if (e.target === lightbox || e.target.classList.contains("inner")) closeLightbox(); };
+document.getElementById("lbClose").onclick = closeLightbox;
+document.getElementById("lbPrev").onclick = e => { e.stopPropagation(); showLightbox(lbIndex - 1); };
+document.getElementById("lbNext").onclick = e => { e.stopPropagation(); showLightbox(lbIndex + 1); };
+
+boot();
+</script>
+</body>
+</html>
