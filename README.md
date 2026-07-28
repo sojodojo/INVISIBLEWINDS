@@ -1,7 +1,7 @@
-# My Life Stories — web edition
+# INVISIBLE WINDS — web edition
 
-This is the complete web edition of the photo book **"My Life Stories"** (*Invisible Winds*,
-36 pages), with a realistic page-turn animation. Everything the book needs — pages, photos,
+This is the complete web edition of the photo book **"Invisible Winds — Stories You Can Not
+See"** (36 pages), with a realistic page-turn animation. Everything the book needs — pages, photos,
 fonts, and the page-flip engine — is inside this folder. There is no database, no server
 code, and no build step: any static web host can serve it as-is.
 
@@ -34,7 +34,7 @@ add a **Code** block, and paste:
     style="position:absolute;top:0;left:0;width:100%;height:100%;border:0;"
     loading="lazy"
     allowfullscreen
-    title="My Life Stories — flip through the book">
+    title="Invisible Winds — flip through the book">
   </iframe>
 </div>
 ```
