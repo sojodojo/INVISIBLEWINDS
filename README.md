@@ -21,7 +21,7 @@ code, and no build step: any static web host can serve it as-is.
 The book is currently hosted at:
 
 ```
-https://sojodojo.github.io/my-life-stories/embed.html
+https://sojodojo.github.io/INVISIBLEWINDS/embed.html
 ```
 
 On Squarespace (Business plan or higher), edit the page where the book should appear,
@@ -30,7 +30,7 @@ add a **Code** block, and paste:
 ```html
 <div style="position:relative;width:100%;padding-bottom:58%;height:0;overflow:hidden;">
   <iframe
-    src="https://sojodojo.github.io/my-life-stories/embed.html?bg=%23ffffff"
+    src="https://sojodojo.github.io/INVISIBLEWINDS/embed.html?bg=%23ffffff"
     style="position:absolute;top:0;left:0;width:100%;height:100%;border:0;"
     loading="lazy"
     allowfullscreen
@@ -60,7 +60,7 @@ domain. It's free either way. Two good options:
 2. Download this repository: on the repository page, click the green **Code** button →
    **Download ZIP**, and unzip it.
 3. In your own GitHub account, create a **new public repository** (any name, e.g.
-   `my-life-stories`), then upload the unzipped files: **Add file → Upload files**, drag
+   `INVISIBLEWINDS`), then upload the unzipped files: **Add file → Upload files**, drag
    everything in, and commit. (If the upload page balks at the folder size, upload the
    folders one at a time — `assets/media` is the big one.)
 4. In the repository: **Settings → Pages** → under "Build and deployment", set Source to
